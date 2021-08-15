@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense ,useRef} from "react";
+import { Canvas, extend,useThree , useFrame} from "react-three-fiber";
+import House from "./House";
+import AdamHead from "./AdamHead";
+// import * as THREE from "three";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+// import { OrbitControls } from "@react-three/drei/OrbitControls";
+// import "./styles.css";
 
-function App() {
+// Extend will make OrbitControls available as a JSX element called orbitControls for us to use.
+extend({ OrbitControls });
+
+const CameraControls = () => {
+  // Get a reference to the Three.js Camera, and the canvas html element.
+  // We need these to setup the OrbitControls component.
+  // https://threejs.org/docs/#examples/en/controls/OrbitControls
+  const {
+    camera,
+    gl: { domElement },
+  } = useThree();
+  // Ref to the controls, so that we can update them on every frame using useFrame
+  const controls = useRef();
+  useFrame((state) => controls.current.update());
+  return <orbitControls ref={controls} args={[camera, domElement]} />;
+};
+
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Canvas style={{height:"100vh"}} >
+      <CameraControls />
+      <ambientLight intensity={0.6} />
+      <directionalLight intensity={0.5} />
+      <Suspense fallback={null}>
+        <House />
+      </Suspense>
+    </Canvas>
   );
 }
-
-export default App;
